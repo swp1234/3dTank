@@ -21,6 +21,8 @@ public class Server {
 	static ServerSocket server;
 	static int clientCount = 0;
 	static HashMap<Socket, String> clientList = new HashMap<Socket, String>();
+	static HashMap<String, SerializableTank> clientTankList = new HashMap<String, SerializableTank>();
+
 	static final String TankClassName = "network.SerializableTank";
 	static final String BulletClassName = "network.SerializableBullet";
 
@@ -61,19 +63,41 @@ public class Server {
 class ThreadServer extends Thread {
 	private Socket clientSocket;
 	ObjectInputStream in;
+	boolean firstLogin;
 
 	public ThreadServer(Socket clientSocket, ObjectInputStream in) {
 		this.clientSocket = clientSocket;
 		this.in = in;
+		firstLogin = true;
 	}
 
 	public void run() {
 		while (true) {
 			try {
+				if (firstLogin) {
+					if (Server.clientList.size() > 0) {
+						synchronized (Server.clientTankList) {
+							for (String clientId : Server.clientTankList.keySet()) {
+								ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+								out.writeObject(Server.clientTankList.get(clientId));
+								out.flush();
+							}
+						}
+					}
+					firstLogin = false;
+				}
+
 				Object obj = in.readObject();
 				String objClassName = obj.getClass().getName();
 				if (objClassName.equals(Server.TankClassName)) {
 					SerializableTank tank = (SerializableTank) obj;
+					synchronized (Server.clientTankList) {
+						if (Server.clientTankList.containsKey(tank.getId())) {
+							Server.clientTankList.replace(tank.getId(), tank);
+						} else {
+							Server.clientTankList.put(tank.getId(), tank);
+						}
+					}
 					sendTankToClients(tank);
 				} else if (objClassName.equals(Server.BulletClassName)) {
 					SerializableBullet bullet = (SerializableBullet) obj;
@@ -83,6 +107,12 @@ class ThreadServer extends Thread {
 				// TODO Auto-generated catch block
 				if (Server.clientList.containsKey(clientSocket)) {
 					String id = Server.clientList.get(clientSocket);
+					synchronized (Server.clientTankList) {
+						if (Server.clientTankList.containsKey(id)) {
+							Server.clientTankList.remove(id);
+						}
+
+					}
 					synchronized (Server.clientList) {
 						Server.clientList.remove(clientSocket);
 						try {
@@ -95,6 +125,7 @@ class ThreadServer extends Thread {
 							System.out.println("ERROR OCURRED AFTER CLIENT " + id + " LEFT");
 						}
 					}
+
 					SerializableTank leftClientTank = new SerializableTank(
 							new Tank(null, new Vector3f(0, 0, 0), 0, 0, 0, 0, id, 0));
 					try {
@@ -104,6 +135,7 @@ class ThreadServer extends Thread {
 					}
 					return;
 				}
+
 			} catch (ClassNotFoundException e) {
 				System.out.println("ERROR OCURRED WHILE RECEIVING DATA FROM CLIENT");
 			}

@@ -30,6 +30,7 @@ import network.SerializableBullet;
 import network.SerializableTank;
 import particles.Particle;
 import particles.ParticleMaster;
+import particles.ParticleSystem;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -133,14 +134,14 @@ public class MainGame {
 			Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass")), "heightmap");
 			MasterRenderer renderer = new MasterRenderer();
 			ParticleMaster.init(loader, renderer.getProjectionMatrix());
+			ParticleSystem system = new ParticleSystem(50, 30, 1, 0.4f, 1);
+			system.setDirection(new Vector3f(0, 1, 0), 0.7f);
+			system.setScaleError(0.2f);
+			system.setLifeError(0.1f);
+			system.setSpeedError(0.8f);
 
 			while (!Display.isCloseRequested()) {
 				camera.move();
-
-				if (Keyboard.isKeyDown(Keyboard.KEY_Y)) {
-					new Particle(new Vector3f(playerTank.getPosition()), new Vector3f(0, 30, 0), 1, 4, 0, 1);
-				}
-
 				ParticleMaster.update();
 
 				// *--- WHEN PLAYER IS ALIVE --- *
@@ -219,6 +220,9 @@ public class MainGame {
 						Tank tank = bullet.inflictDamageonTank(otherTanks);
 						sendBulletToServer(bullet, out);
 						if (tank != null) {
+							for (int i = 0; i < 200; i++) {
+								system.generateParticles(tank.getPosition());
+							}
 							if (tank.getHp() <= 0) {
 								killCount++;
 								killCountText.textRenew("Kill : " + killCount);
