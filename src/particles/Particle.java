@@ -3,6 +3,7 @@ package particles;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Camera;
 import entities.Tank;
 import renderEngine.DisplayManager;
 
@@ -36,6 +37,12 @@ public class Particle {
 	}
 
 	private ParticleTexture texture;
+	private float elapsedTime = 0;
+	private float distance;
+
+	public float getDistance() {
+		return distance;
+	}
 
 	public Particle(ParticleTexture texture, Vector3f position, Vector3f velocity, float gravityEffect,
 			float lifeLength, float rotation, float scale) {
@@ -56,8 +63,6 @@ public class Particle {
 	public void setTexture(ParticleTexture texture) {
 		this.texture = texture;
 	}
-
-	private float elapsedTime = 0;
 
 	public Vector3f getPosition() {
 		return position;
@@ -115,11 +120,12 @@ public class Particle {
 		this.elapsedTime = elapsedTime;
 	}
 
-	protected boolean update() {
+	protected boolean update(Camera camera) {
 		velocity.y += Tank.GRAVITY * gravityEffect * DisplayManager.getFrameTimeSeconds();
 		Vector3f change = new Vector3f(velocity);
 		change.scale(DisplayManager.getFrameTimeSeconds());
 		Vector3f.add(change, position, position);
+		distance = Vector3f.sub(camera.getPosition(), position, null).lengthSquared();
 		updateTextureCoordInfo();
 		elapsedTime += DisplayManager.getFrameTimeSeconds();
 		return elapsedTime < lifeLength;
