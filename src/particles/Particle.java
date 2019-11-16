@@ -14,10 +14,13 @@ public class Particle {
 	private float scale;
 	private float rotation;
 
+	private ParticleTexture texture;
+
 	private float elapsedTime = 0;
 
-	public Particle(Vector3f position, Vector3f velocity, float gravityEffect, float lifeLength, float rotation,
-			float scale) {
+	public Particle(ParticleTexture texture, Vector3f position, Vector3f velocity, float gravityEffect,
+			float lifeLength, float rotation, float scale) {
+		this.texture = texture;
 		this.position = position;
 		this.velocity = velocity;
 		this.gravityEffect = gravityEffect;
@@ -29,6 +32,10 @@ public class Particle {
 
 	public float getRotation() {
 		return rotation;
+	}
+
+	protected ParticleTexture getTexture() {
+		return texture;
 	}
 
 	public void setRotation(float rotation) {
