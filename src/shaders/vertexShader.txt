@@ -17,8 +17,6 @@ uniform vec3 lightPosition;
 
 uniform float useFakeLighting;
 
-uniform float numberOfRows;
-uniform vec2 offset;
 
 const float density = 0.007;
 const float gradient = 1.5;

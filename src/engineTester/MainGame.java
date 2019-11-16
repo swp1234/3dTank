@@ -135,11 +135,11 @@ public class MainGame {
 			Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass")), "heightmap");
 			MasterRenderer renderer = new MasterRenderer();
 			ParticleMaster.init(loader, renderer.getProjectionMatrix());
-			ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 4,true);
-			ParticleSystem system = new ParticleSystem(particleTexture,50, 25, 0.3f, 4, 3);
+			ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 1);
+			ParticleSystem system = new ParticleSystem(particleTexture,40, 10, 0.1f, 1, 5);
+			
 			while (!Display.isCloseRequested()) {
 				camera.move();
-			//	ParticleMaster.update(camera);
 				system.generateParticles(playerTank.getPosition());
 				
 				// *--- WHEN PLAYER IS ALIVE --- *
