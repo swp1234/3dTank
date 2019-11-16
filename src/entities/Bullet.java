@@ -25,6 +25,15 @@ public class Bullet extends Entity {
 	private static float GRAVITY = -40;
 	private float upwardsSpeed = 0;
 	private boolean isAttacked = false;
+	private boolean isParticleSpawned = false;
+
+	public boolean getIsParticleSpawned() {
+		return isParticleSpawned;
+	}
+
+	public void setParticleSpawned(boolean isParticleSpawned) {
+		this.isParticleSpawned = isParticleSpawned;
+	}
 
 	public boolean getIsAttacked() {
 		return isAttacked;

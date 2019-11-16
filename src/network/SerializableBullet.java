@@ -14,6 +14,7 @@ public class SerializableBullet implements Serializable {
 	private float scale;
 	private String id;
 	private boolean isAttacked = false;
+	private boolean isParticleSpawned = false;
 
 	public SerializableBullet(Bullet bullet) {
 		this.x = bullet.getPosition().x;
@@ -24,7 +25,16 @@ public class SerializableBullet implements Serializable {
 		this.rotZ = bullet.getRotZ();
 		this.scale = bullet.getScale();
 		this.id = new String(bullet.getId());
-		isAttacked = bullet.getIsAttacked();
+		this.isAttacked = bullet.getIsAttacked();
+		this.isParticleSpawned = bullet.getIsParticleSpawned();
+	}
+
+	public boolean getIsParticleSpawned() {
+		return isParticleSpawned;
+	}
+
+	public void setParticleSpawned(boolean isParticleSpawned) {
+		this.isParticleSpawned = isParticleSpawned;
 	}
 
 	public Vector3f getPosition() {

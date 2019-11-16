@@ -198,11 +198,17 @@ public class MainGame {
 						leftClientList.add(id);
 					}
 				}
+
 				// *--- RENDER OTEHR PLAYERS' BULLETS
 				for (String id : otherBullets.keySet()) {
 					Bullet bullet = otherBullets.get(id);
 					if (bullet.isDamageable()) {
 						renderer.processEntity(bullet);
+					} else {
+						if (bullet.getIsParticleSpawned()) {
+							GenerateParticle(system, bullet.getPosition());
+							receivedBullets.get(id).setParticleSpawned(false);
+						}
 					}
 				}
 
@@ -221,17 +227,16 @@ public class MainGame {
 						renderer.processEntity(bullet);
 						bullet.move();
 						Tank tank = bullet.inflictDamageonTank(otherTanks);
-						sendBulletToServer(bullet, out);
 						if (tank != null) {
-							for (int i = 0; i < 200; i++) {
-								 system.generateParticles(tank.getPosition());
-							}
+							GenerateParticle(system, tank.getPosition());
+							bullet.setParticleSpawned(true);
 							if (tank.getHp() <= 0) {
 								killCount++;
 								killCountText.textRenew("Kill : " + killCount);
 							}
 							sendTankToServer(tank, out);
 						}
+						sendBulletToServer(bullet, out);
 					} else {
 						destroyedMyBullets.add(bullet);
 					}
@@ -244,7 +249,7 @@ public class MainGame {
 
 				renderer.processTerrain(terrain);
 				renderer.render(light, camera);
-				 ParticleMaster.renderParticles(camera);
+				ParticleMaster.renderParticles(camera);
 				TextMaster.render();
 				DisplayManager.updateDisplay();
 
@@ -267,6 +272,12 @@ public class MainGame {
 
 	public static boolean getType(String word) {
 		return Pattern.matches("^[0-9a-zA-Z]*$", word);
+	}
+
+	public static void GenerateParticle(ParticleSystem system, Vector3f position) {
+		for (int i = 0; i < 200; i++) {
+			system.generateParticles(position);
+		}
 	}
 
 	public static void sendTankToServer(Tank tank, ObjectOutputStream out) {
@@ -313,7 +324,6 @@ public class MainGame {
 	public static void getBulletsFromOtherBullets(TexturedModel bulletModel) {
 		for (String id : receivedBullets.keySet()) {
 			SerializableBullet receivedBullet = receivedBullets.get(id);
-
 			if (otherBullets.containsKey(id)) {
 				Bullet otherBullet = otherBullets.get(id);
 				otherBullet.setPosition(receivedBullet.getPosition());
@@ -321,11 +331,14 @@ public class MainGame {
 				otherBullet.setRotY(receivedBullet.getRotY());
 				otherBullet.setRotZ(receivedBullet.getRotZ());
 				otherBullet.setAttacked(receivedBullet.getIsAttacked());
+				otherBullet.setParticleSpawned(receivedBullet.getIsParticleSpawned());
 			} else {
 				Bullet otherBullet = new Bullet(bulletModel, receivedBullet.getPosition(), receivedBullet.getRotX(),
 						receivedBullet.getRotY(), receivedBullet.getRotZ(), receivedBullet.getScale(), id);
+				otherBullet.setParticleSpawned(receivedBullet.getIsParticleSpawned());
 				otherBullets.put(id, otherBullet);
 			}
+
 		}
 	}
 
