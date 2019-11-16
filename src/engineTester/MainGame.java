@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -28,10 +27,6 @@ import models.RawModel;
 import models.TexturedModel;
 import network.SerializableBullet;
 import network.SerializableTank;
-import particles.Particle;
-import particles.ParticleMaster;
-import particles.ParticleSystem;
-import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -134,14 +129,10 @@ public class MainGame {
 			Light light = new Light(new Vector3f(20000, 20000, 2000), new Vector3f(1, 1, 1));
 			Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass")), "heightmap");
 			MasterRenderer renderer = new MasterRenderer();
-			ParticleMaster.init(loader, renderer.getProjectionMatrix());
-			ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 1);
-			ParticleSystem system = new ParticleSystem(particleTexture,40, 10, 0.1f, 1, 5);
-			
+
 			while (!Display.isCloseRequested()) {
 				camera.move();
-				system.generateParticles(playerTank.getPosition());
-				
+
 				// *--- WHEN PLAYER IS ALIVE --- *
 				if (playerTank.getHp() > 0) {
 					playerTank.move(terrain);
@@ -234,15 +225,12 @@ public class MainGame {
 				}
 				destroyedMyBullets.clear();
 
-
 				renderer.processTerrain(terrain);
 				renderer.render(light, camera);
-				ParticleMaster.renderParticles(camera);
 				TextMaster.render();
 				DisplayManager.updateDisplay();
 
 			}
-			ParticleMaster.cleanUp();
 			renderer.cleanUp();
 			loader.cleanUp();
 			TextMaster.cleanUp();
