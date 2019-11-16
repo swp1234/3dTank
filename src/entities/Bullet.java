@@ -22,7 +22,7 @@ public class Bullet extends Entity {
 	public static final float OFFSET_Z = 0;
 	private static final float SPEED = -200;
 	private static String id = "";
-	private static float GRAVITY = -40;
+	private static float GRAVITY = -65;
 	private float upwardsSpeed = 0;
 	private boolean isAttacked = false;
 	private boolean isParticleSpawned = false;

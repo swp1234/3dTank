@@ -4,13 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -41,7 +49,7 @@ import textures.ModelTexture;
 
 public class MainGame {
 
-	static String serverIp = "127.0.0.1";
+	static String serverIp = "192.168.35.169";
 	static int serverPort = 5555;
 
 	static HashMap<String, SerializableTank> receivedTanks = null;
@@ -77,7 +85,7 @@ public class MainGame {
 	}
 
 	public static void main(String[] args) {
-
+		
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
 		Random random = new Random();
@@ -122,9 +130,8 @@ public class MainGame {
 			RawModel rawBullet = OBJLoader.loadObjModel("bullet", loader);
 			TexturedModel bulletModel = new TexturedModel(rawBullet,
 					new ModelTexture(loader.loadTexture("bulletTexture")));
-
-			// x, z = random.nextFloat() * 400
-			playerTank = new Tank(tankModel, new Vector3f(400, 1, 400), 0, 0, 0, 1, clientId, 100);
+			
+			playerTank = new Tank(tankModel, new Vector3f(random.nextFloat() * 400, 1, random.nextFloat() * 400), 0, 0, 0, 1, clientId, 100);
 			FontType font = new FontType(loader.loadTexture("font"), new File("res/font.fnt"));
 			GUIText Idtext = new GUIText(uniqueId, 2, font, new Vector2f(0, 0.35f), 1f, true);
 			killCountText = new GUIText("Kill : " + killCount, 1.5f, font, new Vector2f(0.4f, 0.05f), 1f, true);
@@ -142,7 +149,7 @@ public class MainGame {
 			system.setScaleError(0.2f);
 			system.setLifeError(0.1f);
 			system.setSpeedError(0.8f);
-
+			playSound("res/bgm.wav");
 			while (!Display.isCloseRequested()) {
 				camera.move();
 				ParticleMaster.update();
@@ -228,6 +235,7 @@ public class MainGame {
 						bullet.move();
 						Tank tank = bullet.inflictDamageonTank(otherTanks);
 						if (tank != null) {
+							playSound("res/bomb.wav");
 							GenerateParticle(system, tank.getPosition());
 							bullet.setParticleSpawned(true);
 							if (tank.getHp() <= 0) {
@@ -269,7 +277,29 @@ public class MainGame {
 		}
 
 	}
+	static void playSound(String soundFile) {
+	    File f = new File("./" + soundFile);
+	    AudioInputStream audioIn;
+		try {
+			audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());
+		    Clip clip = AudioSystem.getClip();
+		    clip.open(audioIn);
+		    clip.start();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
 
+	}
 	public static boolean getType(String word) {
 		return Pattern.matches("^[0-9a-zA-Z]*$", word);
 	}
