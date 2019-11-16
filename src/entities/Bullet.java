@@ -20,7 +20,7 @@ public class Bullet extends Entity {
 	public static final float OFFSET_X = 0;
 	public static final float OFFSET_Y = 2;
 	public static final float OFFSET_Z = 0;
-	private static final float SPEED = -200;
+	private static final float SPEED = -230;
 	private static String id = "";
 	private static float GRAVITY = -65;
 	private float upwardsSpeed = 0;
@@ -77,7 +77,6 @@ public class Bullet extends Entity {
 						&& z >= tank.getPosition().z - Tank.TANK_Z_SIZE && z <= tank.getPosition().z + Tank.TANK_Z_SIZE
 						&& y >= tank.getPosition().y - Tank.TANK_Y_SIZE
 						&& y <= tank.getPosition().y + Tank.TANK_Y_SIZE) {
-					System.out.println("BOMB! BULLET Y : " + this.getPosition().y + "TANK Y : " + tank.getPosition().y);
 					int hp = tank.getHp();
 					tank.setHp(hp - damage);
 					this.isAttacked = true;

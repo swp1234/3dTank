@@ -85,7 +85,7 @@ public class MainGame {
 	}
 
 	public static void main(String[] args) {
-		
+
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
 		Random random = new Random();
@@ -130,8 +130,9 @@ public class MainGame {
 			RawModel rawBullet = OBJLoader.loadObjModel("bullet", loader);
 			TexturedModel bulletModel = new TexturedModel(rawBullet,
 					new ModelTexture(loader.loadTexture("bulletTexture")));
-			
-			playerTank = new Tank(tankModel, new Vector3f(random.nextFloat() * 400, 1, random.nextFloat() * 400), 0, 0, 0, 1, clientId, 100);
+
+			playerTank = new Tank(tankModel, new Vector3f(random.nextFloat() * 400, 1, random.nextFloat() * 400), 0, 0,
+					0, 1, clientId, 100);
 			FontType font = new FontType(loader.loadTexture("font"), new File("res/font.fnt"));
 			GUIText Idtext = new GUIText(uniqueId, 2, font, new Vector2f(0, 0.35f), 1f, true);
 			killCountText = new GUIText("Kill : " + killCount, 1.5f, font, new Vector2f(0.4f, 0.05f), 1f, true);
@@ -165,7 +166,7 @@ public class MainGame {
 								new Vector3f(playerTank.getPosition().x + Bullet.OFFSET_X,
 										playerTank.getPosition().y + Bullet.OFFSET_Y,
 										playerTank.getPosition().z + Bullet.OFFSET_Z),
-								playerTank.getRotX(), playerTank.getRotY(), playerTank.getRotZ(), 0.4f, clientId);
+								playerTank.getRotX(), playerTank.getRotY(), playerTank.getRotZ(), 0.6f, clientId);
 						myBullets.add(bullet);
 						playerTank.setIsFired(false);
 					}
@@ -277,14 +278,18 @@ public class MainGame {
 		}
 
 	}
+
 	static void playSound(String soundFile) {
-	    File f = new File("./" + soundFile);
-	    AudioInputStream audioIn;
+		File f = new File("./" + soundFile);
+		AudioInputStream audioIn;
 		try {
 			audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());
-		    Clip clip = AudioSystem.getClip();
-		    clip.open(audioIn);
-		    clip.start();
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioIn);
+			if (soundFile.contains("bgm")) {
+				clip.loop(Clip.LOOP_CONTINUOUSLY);
+			}
+			clip.start();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -297,9 +302,10 @@ public class MainGame {
 		} catch (LineUnavailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
+		}
 
 	}
+
 	public static boolean getType(String word) {
 		return Pattern.matches("^[0-9a-zA-Z]*$", word);
 	}
