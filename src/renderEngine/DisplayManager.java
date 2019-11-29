@@ -18,8 +18,8 @@ public class DisplayManager {
 		return HEIGHT;
 	}
 
-	private static final int WIDTH = 1280;
-	private static final int HEIGHT = 720;
+	private static final int WIDTH = 1024;
+	private static final int HEIGHT = 576;
 	private static final int FPS_CAP = 120;
 
 	private static long lastFrameTIme;
