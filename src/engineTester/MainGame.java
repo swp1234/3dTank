@@ -104,6 +104,7 @@ public class MainGame {
 		receivedBullets = new HashMap<String, SerializableBullet>();
 		otherBullets = new HashMap<String, Bullet>();
 		Vector3f lastTankPosition = new Vector3f(0, 0, 0);
+		float lastTankRotY = 0;
 
 		List<Bullet> myBullets = new ArrayList<Bullet>();
 		ArrayList<Bullet> destroyedMyBullets = new ArrayList<Bullet>();
@@ -177,19 +178,19 @@ public class MainGame {
 						respawnThread = new RespawnPlayerTank();
 						respawnThread.start();
 						deadCount++;
-						System.out.println(deadCount);
 						deadCountText.textRenew("Dead : " + deadCount);
 					}
 				}
 				if (!(playerTank.getPosition().x == lastTankPosition.x
 						&& playerTank.getPosition().y == lastTankPosition.y
-						&& playerTank.getPosition().z == lastTankPosition.z)) {
+						&& playerTank.getPosition().z == lastTankPosition.z&&
+						playerTank.getRotY() == lastTankRotY)) {
 					sendTankToServer(playerTank, out);
 				}
 				lastTankPosition.x = playerTank.getPosition().x;
 				lastTankPosition.y = playerTank.getPosition().y;
 				lastTankPosition.z = playerTank.getPosition().z;
-
+				lastTankRotY = playerTank.getRotY();
 				if (receiverThread == null) {
 					receiverThread = new ReceiverThread(socket);
 					receiverThread.start();
